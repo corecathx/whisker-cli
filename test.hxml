@@ -1,0 +1,8 @@
+-cp src
+--main Main
+--run Main
+#--cpp target/cpp
+
+# --cmd cd target/cpp
+# --cmd chmod +x ./Main
+# --cmd ./Main
