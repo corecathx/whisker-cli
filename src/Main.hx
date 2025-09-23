@@ -31,7 +31,7 @@ class Main {
 	static var whiskerLockFile = "/tmp/whisker.lck";
 	// static var whiskerQsFolder = userHomeDir + "/.config/whisker";
 	static var whiskerQsFolder = "/usr/share/whisker";
-	static var whiskerUserPref = userWallDir + "/preferences.json";
+	static var whiskerUserPref = whiskerConfigDir + "/preferences.json";
 	static var whiskerCSchemes = whiskerQsFolder + "/schemes.json";
 
 	static function main() {
