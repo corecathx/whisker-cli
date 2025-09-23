@@ -32,7 +32,7 @@ class Main {
 	// static var whiskerQsFolder = userHomeDir + "/.config/whisker";
 	static var whiskerQsFolder = "/usr/share/whisker";
 	static var whiskerUserPref = whiskerConfigDir + "/preferences.json";
-	static var whiskerCSchemes = whiskerQsFolder + "/schemes.json";
+	static var whiskerCSchemes = whiskerConfigDir + "/schemes.json";
 
 	static function main() {
 		var app:App = new App();
