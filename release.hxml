@@ -6,4 +6,3 @@
 --cmd cd target/cpp
 --cmd mv ./Main ./whisker
 --cmd chmod +x ./whisker
---cmd ./whisker
