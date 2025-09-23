@@ -26,11 +26,12 @@ class Main {
 
 	static var userHomeDir = Sys.getEnv("HOME");
 	static var userWallDir = userHomeDir + "/Pictures/wallpapers";
+	static var whiskerConfigDir = userHomeDir + "/.config/whisker";
 
 	static var whiskerLockFile = "/tmp/whisker.lck";
 	// static var whiskerQsFolder = userHomeDir + "/.config/whisker";
 	static var whiskerQsFolder = "/usr/share/whisker";
-	static var whiskerUserPref = whiskerQsFolder + "/preferences.json";
+	static var whiskerUserPref = userWallDir + "/preferences.json";
 	static var whiskerCSchemes = whiskerQsFolder + "/schemes.json";
 
 	static function main() {
