@@ -45,6 +45,7 @@ class Main {
 		var app:App = new App();
 		app.name = 'whisker';
 		app.desc = 'a helper script for whisker shell';
+		app.version = "0.3";
 		app.addCommand('shell', 'start or stop whisker shell', ['stop', '--stdout'], (args) -> {
 			var showStdout:Bool = args.contains("--stdout");
 			if (args.length > 0 && args[0] == "stop") {
