@@ -18,6 +18,11 @@ typedef Command = {
 	callback:Array<String>->Void
 }
 
+typedef LockFile = {
+	pid:String,
+	folder:String
+};
+
 /**
  * Whisker CLI thing
  */
@@ -50,7 +55,9 @@ class Main {
 			var showStdout:Bool = args.contains("--stdout");
 			if (args.length > 0 && args[0] == "stop") {
 				if (FileSystem.exists(whiskerLockFile)) {
-					var pid = File.getContent(whiskerLockFile);
+					var lock:LockFile = Json.parse(File.getContent(whiskerLockFile));
+					var pid = lock.pid;
+					whiskerQsFolder = lock.folder;
 					try {
 						var p = new Process("kill", [pid]);
 						p.close();
@@ -73,7 +80,12 @@ class Main {
 				if (showStdout) {
 					var proc = new Process("quickshell", ["-c", whiskerQsFolder]);
 					var pid = Std.string(proc.getPid());
-					File.saveContent(whiskerLockFile, pid);
+					var lock:LockFile = {
+						pid: pid,
+						folder: whiskerQsFolder
+					};
+					File.saveContent(whiskerLockFile, Json.stringify(lock));
+
 					Sys.println("whisker shell successfully running! (PID: " + pid + ")");
 					try {
 						while (true) {
@@ -86,7 +98,12 @@ class Main {
 				} else {
 					var pid = Utils.runDetached("quickshell -c \"" + whiskerQsFolder + "\"").stdout.readLine();
 
-					File.saveContent(whiskerLockFile, pid);
+					var lock:LockFile = {
+						pid: pid,
+						folder: whiskerQsFolder
+					};
+					File.saveContent(whiskerLockFile, Json.stringify(lock));
+
 					Sys.println("whisker shell successfully running! (PID: " + pid + ")");
 				}
 			} catch (e:Dynamic) {
@@ -271,8 +288,14 @@ class Main {
 			Sys.println('wawa is ok');
 		});
 		app.addCommand('ipc', "call whisker's quickshell ipc", ["target", "action"], (args) -> {
-			Sys.println("ok");
-			// i got lazy
+			if (!FileSystem.exists(whiskerLockFile)) {
+				Sys.println("error: whisker shell not running. use `shell` first.");
+				return;
+			}
+			if (FileSystem.exists(whiskerLockFile)) {
+				var lock:LockFile = Json.parse(File.getContent(whiskerLockFile));
+				whiskerQsFolder = lock.folder;
+			}
 			Utils.runDetached("qs -p " + whiskerQsFolder + " ipc call " + args.join(' '));
 		});
 		app.addCommand('notify', 'test', [], (args) -> {
