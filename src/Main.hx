@@ -35,6 +35,13 @@ class Main {
 	static var whiskerCSchemes = whiskerConfigDir + "/schemes.json";
 
 	static function main() {
+		var args = Sys.args();
+
+		var customFolderIndex = args.indexOf("-p");
+		if (customFolderIndex != -1 && customFolderIndex + 1 < args.length) {
+			whiskerQsFolder = args[customFolderIndex + 1];
+			args.splice(customFolderIndex, 2);
+		}
 		var app:App = new App();
 		app.name = 'whisker';
 		app.desc = 'a helper script for whisker shell';
