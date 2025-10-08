@@ -17,16 +17,16 @@ class PreferencesCommand implements Command {
 		inline function isBoolean(val:Dynamic) {
 			return val == "true" || val == "false";
 		}
-		if (!FileSystem.exists(Globals.whiskerLockFile)) {
+		if (!FileSystem.exists(Globals.whiskerUserPref)) {
 			if (!args.contains('--no-prompt')
 				&& ClawHelpers.prompt("preferences.json file is missing! would you like to create one?", ['y', 'n']) == 'n') {
 				Sys.println('alright.');
 				return;
 			}
-			Sys.println("creating " + Globals.whiskerLockFile);
-			File.saveContent(Globals.whiskerLockFile, "{}");
+			Sys.println("creating " + Globals.whiskerUserPref);
+			File.saveContent(Globals.whiskerUserPref, "{}");
 		}
-		var rawText:String = File.getContent(Globals.whiskerLockFile);
+		var rawText:String = File.getContent(Globals.whiskerUserPref);
 		var jsonData:Dynamic = Json.parse(rawText);
 		if (args.contains('set')) {
 			if (args.length < 3) {
@@ -36,7 +36,7 @@ class PreferencesCommand implements Command {
 			var key = args[1];
 			var value:Dynamic = isBoolean(args[2]) ? args[2] == 'true' : args[2];
 			Reflect.setProperty(jsonData, key, value);
-			File.saveContent(Globals.whiskerLockFile, Json.stringify(jsonData, null, '\t'));
+			File.saveContent(Globals.whiskerUserPref, Json.stringify(jsonData, null, '\t'));
 
 			if (FileSystem.exists(Globals.whiskerCSchemes)) {
 				// :sob:
