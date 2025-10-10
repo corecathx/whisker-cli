@@ -14,20 +14,14 @@ class WallpapersCommand implements Command {
 	public function new() {}
 
 	public function execute(args:Array<String>) {
-		if (args.length == 0) {
-			Sys.println("error: missing wallpaper path");
-			return;
-		}
+		if (args.length == 0)
+			throw "missing wallpaper path";
 
-		if (!FileSystem.exists(Globals.whiskerUserPref)) {
-			Sys.println("error: whisker user preferences not found");
-            return;
-		}
+		if (!FileSystem.exists(Globals.whiskerUserPref))
+			throw "whisker user preferences not found";
 
-		if (!FileSystem.exists(args[0])) {
-			Sys.println("error: file at " + args[0] + " doesn't exist");
-			return;
-		}
+		if (!FileSystem.exists(args[0]))
+			throw "file at " + args[0] + " doesn't exist";
 
 		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
 		prefs.wallpaper = args[0];

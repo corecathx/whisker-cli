@@ -30,6 +30,8 @@ class Main {
 		app.addCommand(new ShellCommand());
 		app.addCommand(new PreferencesCommand());
 		app.addCommand(new WallpapersCommand());
+		app.addCommand(new ScreenCommand());
+		app.addCommand(new NotifyCommand());
 		app.addCommand(new ListsCommand());
 		app.addCommand(new WawaCommand());
 		app.addCommand(new IpcCommand());

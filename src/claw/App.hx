@@ -1,5 +1,6 @@
 package claw;
 
+import haxe.Exception;
 import claw.commands.HelpCommand;
 
 /**
@@ -52,8 +53,14 @@ class App {
 		var cmdArgs:Array<String> = args.slice(1);
 
 		var cmd:Command = commands.filter(c -> c.name == cmdName)[0];
-		if (cmd != null)
-			cmd.execute(cmdArgs);
+		if (cmd != null) {
+		    try {
+    			cmd.execute(cmdArgs);
+			} catch (e:Exception) {
+			    Sys.println('error: ' + e.message);
+				Sys.exit(1);
+			}
+		}
 		else
 			Sys.println('${name}: unknown command "${cmdName}". see "${name} help".');
 	}

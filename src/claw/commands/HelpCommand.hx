@@ -7,10 +7,10 @@ class HelpCommand implements Command {
 	public var arguments:Array<String> = [];
 
     public function new() {}
-    
+
 	public function execute(args:Array<String>) {
-        if (App.instance == null) 
-            throw "error: App instance is null.";
+        if (App.instance == null)
+            throw "[INTERNAL] App instance is null.";
         Sys.println('${App.instance.name} v${App.instance.version} - ${App.instance.desc}');
         Sys.println("\nusage:");
         Sys.println('  ${App.instance.name} <command> [arguments]');
@@ -19,7 +19,7 @@ class HelpCommand implements Command {
             var argStr:String = "";
             for (i in cmd.arguments)
                 argStr += '[$i] ';
-            Sys.println('  ' + ClawHelpers.padRight(cmd.name + " " + argStr, 35) + cmd.description);
+            Sys.println('  ' + ClawHelpers.padRight(cmd.name + " " + argStr, 45) + cmd.description);
         }
     }
 }

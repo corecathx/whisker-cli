@@ -14,10 +14,9 @@ class IpcCommand implements Command {
     public function new() {}
 
 	public function execute(args:Array<String>) {
-		if (!FileSystem.exists(Globals.whiskerLockFile)) {
-			Sys.println("error: whisker shell not running. use `shell` first.");
-			return;
-		}
+		if (!FileSystem.exists(Globals.whiskerLockFile))
+			throw "whisker shell not running. use `shell` first.";
+
 		if (FileSystem.exists(Globals.whiskerLockFile)) {
 			var lock:LockFile = Json.parse(File.getContent(Globals.whiskerLockFile));
 			Globals.whiskerQsFolder = lock.folder;
