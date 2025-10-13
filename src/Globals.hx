@@ -11,6 +11,8 @@ class Globals {
 	static var whiskerConfigDir:String = userHomeDir + "/.config/whisker";
 
 	static var whiskerLockFile:String = "/tmp/whisker.lck";
+	static var whiskerWelcomeLockFile:String = "/tmp/whisker-welcome.lck";
+
 	static var whiskerQsFolder:String = "/usr/share/whisker";
 	static var whiskerUserPref:String = whiskerConfigDir + "/preferences.json";
 	static var whiskerCSchemes:String = whiskerConfigDir + "/schemes.json";

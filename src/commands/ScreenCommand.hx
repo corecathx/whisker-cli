@@ -13,19 +13,6 @@ class ScreenCommand implements Command {
     public function new() {}
 
     public function execute(args:Array<String>) {
-        if (args.length == 0)
-            throw "no action was provided [capture]";
-
-        switch (args[0]) {
-            case "capture":
-                handleCapture(args);
-
-            default:
-                throw 'unknown action "${args[0]}"';
-        }
-    }
-
-    private function handleCapture(args:Array<String>) {
         var now = Date.now();
         var timestamp = '${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}';
         var outputPath = '${Globals.userCaptureDir}/screenshot_${timestamp}.png';
@@ -37,46 +24,61 @@ class ScreenCommand implements Command {
 
         var region:String = null;
         var copyToClipboard = false;
+        var sourcePath:String = null;
 
         for (arg in args) {
             if (StringTools.startsWith(arg, "--region="))
                 region = arg.substr("--region=".length);
             else if (arg == "--copy")
                 copyToClipboard = true;
+            else if (StringTools.startsWith(arg, "--source="))
+                sourcePath = arg.substr("--source=".length);
         }
 
         try {
-            if (region != null) {
-                var formattedRegion = region.split("_").join(" ");
-                var proc = new Process("grim", ["-g", formattedRegion, outputPath]);
-                proc.exitCode();
+            if (sourcePath != null && FileSystem.exists(sourcePath) && region != null) {
+                var parts = region.split("_");
+                var coords = parts[0].split(",");
+                var size = parts[1].split("x");
+                var x = Std.parseInt(coords[0]);
+                var y = Std.parseInt(coords[1]);
+                var w = Std.parseInt(size[0]);
+                var h = Std.parseInt(size[1]);
+
+                var proc = new Process("ffmpeg", ["-i", sourcePath, "-vf", 'crop=${w}:${h}:${x}:${y}', "-y", outputPath]);
+                var exitCode = proc.exitCode();
                 proc.close();
+
+                if (exitCode != 0)
+                    throw "ffmpeg failed to crop image";
             } else {
-                var proc = new Process("grim", [outputPath]);
-                proc.exitCode();
-                proc.close();
+                if (region != null) {
+                    var formattedRegion = region.split("_").join(" ");
+                    var proc = new Process("grim", ["-g", formattedRegion, outputPath]);
+                    proc.exitCode();
+                    proc.close();
+                } else {
+                    var proc = new Process("grim", [outputPath]);
+                    proc.exitCode();
+                    proc.close();
+                }
             }
 
             if (!FileSystem.exists(outputPath))
-                throw "grim failed to capture the screen.";
+                throw "screenshot not created";
 
             if (copyToClipboard) {
-                try {
-                    var imgData = File.getBytes(outputPath);
-                    var wlcopy = new Process("wl-copy", ["--type", "image/png"]);
-                    wlcopy.stdin.writeBytes(imgData, 0, imgData.length);
-                    wlcopy.stdin.close();
-                    wlcopy.close();
-
-                    Sys.println('$outputPath (also copied to clipboard)');
-                } catch (e:Dynamic) {
-                    throw 'failed to copy to clipboard -> $e';
-                }
+                var imgData = File.getBytes(outputPath);
+                var wlcopy = new Process("wl-copy", ["--type", "image/png"]);
+                wlcopy.stdin.writeBytes(imgData, 0, imgData.length);
+                wlcopy.stdin.close();
+                wlcopy.close();
+                Sys.println('$outputPath (copied to clipboard)');
             } else {
-                Sys.println('$outputPath');
+                Sys.println(outputPath);
             }
         } catch (e:Dynamic) {
-            throw 'failed to execute grim -> $e';
+            throw 'screenshot failed -> $e';
         }
     }
 

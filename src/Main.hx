@@ -34,6 +34,7 @@ class Main {
 		app.addCommand(new NotifyCommand());
 		app.addCommand(new ListsCommand());
 		app.addCommand(new WawaCommand());
+		app.addCommand(new WelcomeCommand());
 		app.addCommand(new IpcCommand());
 
 		app.run();
