@@ -50,7 +50,7 @@ class WallpapersCommand implements Command {
 				'--dry-run'
 			]);
 			process.exitCode();
-			var json:String = process.stdout.readAll().toString().trim().split('\n')[0];
+			var json:String = process.stdout.readAll().toString().trim();
 			var parsed:Dynamic = Json.parse(json);
 			Reflect.setField(colorsJson, scheme, parsed.colors);
 		}
