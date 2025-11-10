@@ -24,7 +24,14 @@ class WallpapersCommand implements Command {
 			throw "file at " + args[0] + " doesn't exist";
 
 		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
-		prefs.wallpaper = args[0];
+		if (!Reflect.hasField(prefs, 'theme')) {
+		    Reflect.setProperty(prefs, 'theme', {
+				wallpaper: args[0]
+			});
+		} else {
+    		prefs.theme.wallpaper = args[0];
+
+		}
 		Sys.println('generating color schemes...');
 		var colorsJson:Dynamic = {}
 		for (scheme in [
@@ -40,9 +47,9 @@ class WallpapersCommand implements Command {
 			Sys.println("  " + scheme);
 			var process:Process = new Process('matugen', [
 				'image',
-				prefs.wallpaper,
+				prefs.theme.wallpaper,
 				'-m',
-				prefs.darkMode ? 'dark' : 'light',
+				prefs.theme.dark ? 'dark' : 'light',
 				'-t',
 				'scheme-$scheme',
 				'-j',
@@ -56,13 +63,13 @@ class WallpapersCommand implements Command {
 		}
 		// one last thing
 		var process:Process = new Process('matugen', [
-			'image',                   prefs.wallpaper,
-			   '-m', prefs.darkMode ? 'dark' : 'light',
-			   '-t',     'scheme-${prefs.colorScheme}',
-			   '-j',                             'hex',
+			'image',               prefs.theme.wallpaper,
+			   '-m', prefs.theme.dark ? 'dark' : 'light',
+			   '-t',       'scheme-${prefs.theme.scheme}',
+			   '-j',                               'hex',
 		]);
-		colorsJson.active = prefs.colorScheme;
-		colorsJson.mode = prefs.darkMode ? 'dark' : 'light';
+		colorsJson.active = prefs.theme.scheme;
+		colorsJson.mode = prefs.theme.dark ? 'dark' : 'light';
 		// Reflect.setField(colorsJson, scheme, parsed.colors);
 
 		File.saveContent(Globals.whiskerCSchemes, Json.stringify(colorsJson));
