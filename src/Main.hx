@@ -28,6 +28,7 @@ class Main {
 		app.desc = 'a helper script for whisker shell';
 		app.version = "0.5";
 		app.addCommand(new ShellCommand());
+		app.addCommand(new IntegrationCommand());
 		app.addCommand(new PreferencesCommand());
 		app.addCommand(new WallpapersCommand());
 		app.addCommand(new ScreenCommand());

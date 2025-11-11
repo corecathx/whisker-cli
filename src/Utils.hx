@@ -4,6 +4,9 @@ import sys.io.Process;
 using StringTools;
 
 class Utils {
+    public static function getRandom(array:Array<Any>) {
+        return array[Std.int(Math.random()*array.length)];
+    }
     public static function runDetached(command:String) {
         var fullCmd = "nohup " + command + " >/dev/null 2>&1 & echo $!";
         var pidProc = new Process("/bin/sh", ["-c", fullCmd]);

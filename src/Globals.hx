@@ -9,11 +9,17 @@ class Globals {
 	static var userRecordsDir:String = userHomeDir + "/Videos/screenrecords";
 
 	static var whiskerConfigDir:String = userHomeDir + "/.config/whisker";
+	static var whiskerLocalDir:String = userHomeDir + "/.local/whisker";
 
 	static var whiskerLockFile:String = "/tmp/whisker.lck";
 	static var whiskerWelcomeLockFile:String = "/tmp/whisker-welcome.lck";
 
 	static var whiskerQsFolder:String = "/usr/share/whisker";
 	static var whiskerUserPref:String = whiskerConfigDir + "/preferences.json";
-	static var whiskerCSchemes:String = whiskerConfigDir + "/schemes.json";
+	static var whiskerCSchemes:String = whiskerLocalDir + "/schemes.json";
+
+	// the path where whisker stores its hyprland integration files
+	// which later injects it to user's hyprland config
+	static var whiskerHyprlandConfig:String = whiskerLocalDir + "/whisker-hyprland.conf";
+
 }
