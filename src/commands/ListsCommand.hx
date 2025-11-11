@@ -1,5 +1,4 @@
 package commands;
-
 import sys.io.Process;
 import sys.io.File;
 import haxe.Json;
@@ -18,6 +17,7 @@ class ListsCommand implements Command {
 			throw "type is missing [wallpapers]";
 
 		var imageExts = ["png", "jpg", "jpeg", "webp", "bmp", "gif", "tif", "tiff", "ico"];
+		var videoExts = ["mp4", "mkv", "webm", "avi", "mov", "flv", "wmv", "m4v"];
 
 		switch (args[0]) {
 			case "wallpapers":
@@ -26,7 +26,7 @@ class ListsCommand implements Command {
 
 				for (wp in FileSystem.readDirectory(Globals.userWallDir)) {
 					var ext = wp.split(".").pop().toLowerCase();
-					if (imageExts.contains(ext))
+					if (imageExts.contains(ext) || videoExts.contains(ext))
 						Sys.println('${Globals.userWallDir}/$wp');
 				}
 			default:

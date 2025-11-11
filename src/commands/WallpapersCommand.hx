@@ -1,5 +1,4 @@
 package commands;
-
 import sys.io.Process;
 import sys.io.File;
 import haxe.Json;
@@ -13,6 +12,29 @@ class WallpapersCommand implements Command {
 
 	public function new() {}
 
+	private function isVideo(path:String):Bool {
+		var videoExts = ["mp4", "mkv", "webm", "avi", "mov", "flv", "wmv", "m4v"];
+		var ext = path.split(".").pop().toLowerCase();
+		return videoExts.contains(ext);
+	}
+
+	private function extractVideoFrame(videoPath:String, outputPath:String):Void {
+		Sys.println('extracting frame from video...');
+		var process = new Process('ffmpeg', [
+			'-ss', '20', // most videos have these intros so i guess it's safe to set this to 20 secs in
+			'-i', videoPath,
+			'-vframes', '1',
+			'-y',
+			outputPath
+		]);
+		var exitCode = process.exitCode();
+		if (exitCode != 0) {
+			var error = process.stderr.readAll().toString();
+			throw "failed to extract frame from video: " + error;
+		}
+		process.close();
+	}
+
 	public function execute(args:Array<String>) {
 		if (args.length == 0)
 			throw "missing wallpaper path";
@@ -24,16 +46,26 @@ class WallpapersCommand implements Command {
 			throw "file at " + args[0] + " doesn't exist";
 
 		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
+
 		if (!Reflect.hasField(prefs, 'theme')) {
-		    Reflect.setProperty(prefs, 'theme', {
+			Reflect.setProperty(prefs, 'theme', {
 				wallpaper: args[0]
 			});
 		} else {
-    		prefs.theme.wallpaper = args[0];
-
+			prefs.theme.wallpaper = args[0];
 		}
+
+		var imageForColors = args[0];
+		var isVideoWallpaper = isVideo(args[0]);
+
+		if (isVideoWallpaper) {
+			imageForColors = '/tmp/whisker-color-generation.png';
+			extractVideoFrame(args[0], imageForColors);
+		}
+
 		Sys.println('generating color schemes...');
 		var colorsJson:Dynamic = {}
+
 		for (scheme in [
 			'content',
 			'expressive',
@@ -47,7 +79,7 @@ class WallpapersCommand implements Command {
 			Sys.println("  " + scheme);
 			var process:Process = new Process('matugen', [
 				'image',
-				prefs.theme.wallpaper,
+				imageForColors,
 				'-m',
 				prefs.theme.dark ? 'dark' : 'light',
 				'-t',
@@ -60,17 +92,23 @@ class WallpapersCommand implements Command {
 			var json:String = process.stdout.readAll().toString().trim();
 			var parsed:Dynamic = Json.parse(json);
 			Reflect.setField(colorsJson, scheme, parsed.colors);
+			process.close();
 		}
-		// one last thing
+
 		var process:Process = new Process('matugen', [
-			'image',               prefs.theme.wallpaper,
-			   '-m', prefs.theme.dark ? 'dark' : 'light',
-			   '-t',       'scheme-${prefs.theme.scheme}',
-			   '-j',                               'hex',
+			'image', imageForColors,
+			'-m', prefs.theme.dark ? 'dark' : 'light',
+			'-t', 'scheme-${prefs.theme.scheme}',
+			'-j', 'hex',
 		]);
+		process.exitCode();
+		process.close();
+
 		colorsJson.active = prefs.theme.scheme;
 		colorsJson.mode = prefs.theme.dark ? 'dark' : 'light';
-		// Reflect.setField(colorsJson, scheme, parsed.colors);
+
+		if (isVideoWallpaper && FileSystem.exists(imageForColors))
+			FileSystem.deleteFile(imageForColors);
 
 		File.saveContent(Globals.whiskerCSchemes, Json.stringify(colorsJson));
 		File.saveContent(Globals.whiskerUserPref, Json.stringify(prefs));
