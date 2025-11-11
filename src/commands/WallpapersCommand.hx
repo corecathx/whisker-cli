@@ -48,11 +48,22 @@ class WallpapersCommand implements Command {
 		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
 
 		if (!Reflect.hasField(prefs, 'theme')) {
-			Reflect.setProperty(prefs, 'theme', {
-				wallpaper: args[0]
+		    Sys.println("preferences has missing field 'theme', loaded defaults");
+			Reflect.setProperty(prefs, 'theme', { // load whisker's defaults
+				wallpaper: args[0],
+				mode: 'dark',
+				scheme: 'tonal-spot'
 			});
 		} else {
 			prefs.theme.wallpaper = args[0];
+
+			var requiredFieldDefaults:Array<Array<Dynamic>> = [['dark', true], ['scheme', 'tonal-spot']];
+			for (requiredFields in requiredFieldDefaults) {
+			    if (!Reflect.hasField(prefs.theme,requiredFields[0])) {
+    			    Sys.println("missing field '" + requiredFields[0] + "', loaded defaults ("+requiredFields[1]+")");
+					Reflect.setProperty(prefs.theme, requiredFields[0], requiredFields[1]);
+				}
+			}
 		}
 
 		var imageForColors = args[0];
@@ -103,7 +114,6 @@ class WallpapersCommand implements Command {
 		]);
 		process.exitCode();
 		process.close();
-
 		colorsJson.active = prefs.theme.scheme;
 		colorsJson.mode = prefs.theme.dark ? 'dark' : 'light';
 
