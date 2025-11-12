@@ -51,7 +51,7 @@ class WallpapersCommand implements Command {
 		    Sys.println("preferences has missing field 'theme', loaded defaults");
 			Reflect.setProperty(prefs, 'theme', { // load whisker's defaults
 				wallpaper: args[0],
-				mode: 'dark',
+				dark: true,
 				scheme: 'tonal-spot'
 			});
 		} else {
@@ -65,6 +65,11 @@ class WallpapersCommand implements Command {
 				}
 			}
 		}
+
+		if (!FileSystem.exists(Globals.whiskerLocalDir))
+            FileSystem.createDirectory(Globals.whiskerLocalDir);
+        else if (!FileSystem.isDirectory(Globals.whiskerLocalDir))
+            throw '${Globals.whiskerLocalDir} exists, but it\'s not a directory... why?';
 
 		var imageForColors = args[0];
 		var isVideoWallpaper = isVideo(args[0]);
