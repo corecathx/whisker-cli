@@ -9,7 +9,7 @@ class Globals {
 	static var userRecordsDir:String = userHomeDir + "/Videos/screenrecords";
 
 	static var whiskerConfigDir:String = userHomeDir + "/.config/whisker";
-	static var whiskerLocalDir:String = userHomeDir + "/.local/whisker";
+	static var whiskerLocalDir:String = userHomeDir + "/.local/share/whisker";
 
 	static var whiskerLockFile:String = "/tmp/whisker.lck";
 	static var whiskerWelcomeLockFile:String = "/tmp/whisker-welcome.lck";
