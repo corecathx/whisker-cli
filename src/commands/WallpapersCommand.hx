@@ -8,7 +8,7 @@ import claw.Command;
 class WallpapersCommand implements Command {
 	public var name:String = "wallpaper";
 	public var description:String = "change wallpaper";
-	public var arguments:Array<String> = ['path'];
+	public var arguments:Array<String> = ['path', '--no-scheme-gen'];
 
 	public function new() {}
 
@@ -21,11 +21,12 @@ class WallpapersCommand implements Command {
 	private function extractVideoFrame(videoPath:String, outputPath:String):Void {
 		Sys.println('extracting frame from video...');
 		var process = new Process('ffmpeg', [
-			'-ss', '20', // most videos have these intros so i guess it's safe to set this to 20 secs in
-			'-i', videoPath,
-			'-vframes', '1',
-			'-y',
-			outputPath
+    		'-ss', '20',
+            '-i', videoPath,
+            '-vf', 'scale=320:-1',
+            '-frames:v', '1',
+            '-y',
+            outputPath
 		]);
 		var exitCode = process.exitCode();
 		if (exitCode != 0) {
@@ -78,38 +79,44 @@ class WallpapersCommand implements Command {
 			imageForColors = '/tmp/whisker-color-generation.png';
 			extractVideoFrame(args[0], imageForColors);
 		}
-
-		Sys.println('generating color schemes...');
 		var colorsJson:Dynamic = {}
 
-		for (scheme in [
-			'content',
-			'expressive',
-			'fidelity',
-			'fruit-salad',
-			'monochrome',
-			'neutral',
-			'rainbow',
-			'tonal-spot'
-		]) {
-			Sys.println("  " + scheme);
-			var process:Process = new Process('matugen', [
-				'image',
-				imageForColors,
-				'-m',
-				prefs.theme.dark ? 'dark' : 'light',
-				'-t',
-				'scheme-$scheme',
-				'-j',
-				'hex',
-				'--dry-run'
-			]);
-			process.exitCode();
-			var json:String = process.stdout.readAll().toString().trim();
-			var parsed:Dynamic = Json.parse(json);
-			Reflect.setField(colorsJson, scheme, parsed.colors);
-			process.close();
+		if (!args.contains('--no-scheme-gen')) {
+		    Sys.println('generating color schemes...');
+
+    		for (scheme in [
+    			'content',
+    			'expressive',
+    			'fidelity',
+    			'fruit-salad',
+    			'monochrome',
+    			'neutral',
+    			'rainbow',
+    			'tonal-spot'
+    		]) {
+    			Sys.println("  " + scheme);
+    			var process:Process = new Process('matugen', [
+    				'image',
+    				imageForColors,
+    				'-m',
+    				prefs.theme.dark ? 'dark' : 'light',
+    				'-t',
+    				'scheme-$scheme',
+    				'-j',
+    				'hex',
+    				'--dry-run'
+    			]);
+    			process.exitCode();
+    			var json:String = process.stdout.readAll().toString().trim();
+    			var parsed:Dynamic = Json.parse(json);
+    			Reflect.setField(colorsJson, scheme, parsed.colors);
+    			process.close();
+    		}
+		} else {
+		    Sys.println('"--no-scheme-gen" passed, skipping color schemes generation...');
 		}
+
+        Sys.println('requesting matugen to refresh templates...');
 
 		var process:Process = new Process('matugen', [
 			'image', imageForColors,
@@ -119,13 +126,18 @@ class WallpapersCommand implements Command {
 		]);
 		process.exitCode();
 		process.close();
-		colorsJson.active = prefs.theme.scheme;
-		colorsJson.mode = prefs.theme.dark ? 'dark' : 'light';
+		if (!args.contains('--no-scheme-gen')) {
+    		colorsJson.active = prefs.theme.scheme;
+    		colorsJson.mode = prefs.theme.dark ? 'dark' : 'light';
+		}
 
 		if (isVideoWallpaper && FileSystem.exists(imageForColors))
 			FileSystem.deleteFile(imageForColors);
 
-		File.saveContent(Globals.whiskerCSchemes, Json.stringify(colorsJson));
+		if (!args.contains('--no-scheme-gen')) {
+    		File.saveContent(Globals.whiskerCSchemes, Json.stringify(colorsJson));
+		}
 		File.saveContent(Globals.whiskerUserPref, Json.stringify(prefs));
+		Sys.println("wallpaper successfully changed!");
 	}
 }
