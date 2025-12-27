@@ -74,7 +74,10 @@ class WallpapersCommand implements Command {
 
 		var imageForColors = args[0];
 		var isVideoWallpaper = isVideo(args[0]);
-
+		var contrast = 0.0;
+		if (Reflect.hasField(prefs.theme, "contrast")) {
+		    contrast = prefs.theme.contrast;
+		}
 		if (isVideoWallpaper) {
 			imageForColors = '/tmp/whisker-color-generation.png';
 			extractVideoFrame(args[0], imageForColors);
@@ -104,6 +107,8 @@ class WallpapersCommand implements Command {
     				'scheme-$scheme',
     				'-j',
     				'hex',
+                    '--contrast',
+                    Std.string(contrast),
     				'--dry-run'
     			]);
     			process.exitCode();
@@ -123,6 +128,7 @@ class WallpapersCommand implements Command {
 			'-m', prefs.theme.dark ? 'dark' : 'light',
 			'-t', 'scheme-${prefs.theme.scheme}',
 			'-j', 'hex',
+            '--contrast', Std.string(contrast),
 		]);
 		process.exitCode();
 		process.close();
