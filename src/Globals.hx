@@ -2,6 +2,8 @@ package;
 
 @:publicFields
 class Globals {
+    static var currentUser:String = Sys.getEnv("USER");
+
     static var userHomeDir:String = Sys.getEnv("HOME");
 	static var userWallDir:String = userHomeDir + "/Pictures/wallpapers";
 
@@ -17,6 +19,10 @@ class Globals {
 	static var whiskerQsFolder:String = "/usr/share/whisker";
 	static var whiskerUserPref:String = whiskerConfigDir + "/preferences.json";
 	static var whiskerCSchemes:String = whiskerLocalDir + "/schemes.json";
+
+	static var whiskerGreeterDir:String = "/var/lib/whisker";
+	static var whiskerGreeterAvatarDir:String = whiskerGreeterDir + "/avatars";
+	static var whiskerGreeterWallpaperDir:String = whiskerGreeterDir + "/wallpapers";
 
 	// the path where whisker stores its hyprland integration files
 	// which later injects it to user's hyprland config

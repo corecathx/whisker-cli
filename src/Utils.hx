@@ -1,5 +1,6 @@
 package;
 
+import sys.io.File;
 import sys.io.Process;
 using StringTools;
 
@@ -48,5 +49,24 @@ class Utils {
         } catch (e:Dynamic) {
             return "Unknown";
         }
+    }
+
+    public static function isRoot():Bool {
+        var checkRootProc = new Process("id", ["-u"]);
+		var output = checkRootProc.stdout.readAll().toString().trim();
+		checkRootProc.close();
+		return output == "0";
+    }
+    public static function userExists(username:String):Bool {
+        try {
+            var passwd = File.getContent("/etc/passwd");
+            for (line in passwd.split("\n")) {
+                if (line.startsWith(username + ":")) {
+                    return true;
+                }
+            }
+        } catch (e) {
+        }
+        return false;
     }
 }

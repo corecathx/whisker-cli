@@ -37,6 +37,7 @@ class Main {
 		app.addCommand(new WawaCommand());
 		app.addCommand(new WelcomeCommand());
 		app.addCommand(new IpcCommand());
+		app.addCommand(new UsersCommand());
 
 		app.run();
 	}
