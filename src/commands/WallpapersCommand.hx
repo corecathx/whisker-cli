@@ -75,11 +75,6 @@ class WallpapersCommand implements Command {
 		var imageForColors = args[0];
 		var isVideoWallpaper = isVideo(args[0]);
 
-		if (!isVideoWallpaper) {
-			// update the image thingy for the greeter
-			UsersCommand.run([Globals.currentUser, "wallpaper", args[0]]);
-		}
-
 		var contrast = 0.0;
 		if (Reflect.hasField(prefs.theme, "contrast")) {
 		    contrast = prefs.theme.contrast;
@@ -151,5 +146,8 @@ class WallpapersCommand implements Command {
 		}
 		File.saveContent(Globals.whiskerUserPref, Json.stringify(prefs));
 		Sys.println("wallpaper successfully changed!");
+		if (!isVideoWallpaper && args.contains('--apply-greeter')) {
+			UsersCommand.wallpaper([Globals.currentUser, "wallpaper", args[0]]);
+		}
 	}
 }
