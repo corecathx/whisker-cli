@@ -25,8 +25,8 @@ class Main {
 		}
 		var app:App = new App();
 		app.name = 'whisker';
-		app.desc = 'a helper script for whisker shell';
-		app.version = "0.5";
+		app.desc = 'cli for whisker shell';
+		app.version = "0.6";
 		app.addCommand(new ShellCommand());
 		app.addCommand(new IntegrationCommand());
 		app.addCommand(new PreferencesCommand());

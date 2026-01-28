@@ -10,13 +10,13 @@ import claw.Command;
 class ShellCommand implements Command {
 	public var name:String = "shell";
 	public var description:String = "start or stop whisker shell";
-	public var arguments:Array<String> = ['stop', '--stdout'];
+	public var arguments:Array<String> = ['stop', 'restart', '--stdout'];
 
     public function new() { }
 
 	public function execute(args:Array<String>) {
 		var showStdout:Bool = args.contains("--stdout");
-		if (args.length > 0 && args[0] == "stop") {
+		if (args.length > 0 && (args[0] == "stop" || args[0] == "restart")) {
 			if (FileSystem.exists(Globals.whiskerLockFile)) {
 				var lock:LockFile = Json.parse(File.getContent(Globals.whiskerLockFile));
 				var pid = lock.pid;
@@ -31,7 +31,8 @@ class ShellCommand implements Command {
 				}
 			} else
 				Sys.println("whisker shell is not running.");
-			return;
+			if (args[0] != 'restart')
+    			return;
 		}
 
 		if (FileSystem.exists(Globals.whiskerLockFile)) {
