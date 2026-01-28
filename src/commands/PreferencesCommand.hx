@@ -13,6 +13,9 @@ class PreferencesCommand implements Command {
 		inline function isBoolean(val:Dynamic) {
 			return val == "true" || val == "false";
 		}
+		if (!FileSystem.exists(Globals.whiskerConfigDir)) {
+		    FileSystem.createDirectory(Globals.whiskerConfigDir);
+		}
 		if (!FileSystem.exists(Globals.whiskerUserPref)) {
 			if (!args.contains('--no-prompt')
 				&& ClawHelpers.prompt("preferences.json file is missing! would you like to create one?", ['y', 'n']) == 'n') {
