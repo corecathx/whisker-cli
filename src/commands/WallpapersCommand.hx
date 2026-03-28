@@ -99,7 +99,7 @@ class WallpapersCommand implements Command {
     			'tonal-spot'
     		]) {
     			Sys.println("  " + scheme);
-    			var process:Process = new Process('matugen', [
+				var args:Array<String> = [
     				'image',
     				imageForColors,
     				'-m',
@@ -110,8 +110,12 @@ class WallpapersCommand implements Command {
     				'hex',
                     '--contrast',
                     Std.string(contrast),
-    				'--dry-run'
-    			]);
+    				'--dry-run',
+					"--source-color-index", "0",
+					"--old-json-output"
+    			];
+    			var process:Process = new Process('matugen', args);
+				// trace('command: matugen ' + args.join(' '));
     			process.exitCode();
     			var json:String = process.stdout.readAll().toString().trim();
     			var parsed:Dynamic = Json.parse(json);
