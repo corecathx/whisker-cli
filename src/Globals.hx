@@ -24,8 +24,10 @@ class Globals {
 	static var whiskerGreeterAvatarDir:String = whiskerGreeterDir + "/avatars";
 	static var whiskerGreeterWallpaperDir:String = whiskerGreeterDir + "/wallpapers";
 
+	static var userHyprConfigDir:String = userHomeDir + "/.config/hypr";
+
 	// the path where whisker stores its hyprland integration files
 	// which later injects it to user's hyprland config
-	static var whiskerHyprlandConfig:String = whiskerLocalDir + "/whisker-hyprland.conf";
+	static var whiskerHyprlandConfig:String = userHyprConfigDir + "/whisker.lua";
 
 }
