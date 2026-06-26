@@ -134,6 +134,7 @@ class WallpapersCommand implements Command {
 			'-t', 'scheme-${prefs.theme.scheme}',
 			'-j', 'hex',
             '--contrast', Std.string(contrast),
+			"--source-color-index", "0",
 		]);
 		process.exitCode();
 		process.close();
