@@ -17,7 +17,7 @@ class Main {
 
 	static function main() {
 		var args = Sys.args();
-
+		
 		var customFolderIndex = args.indexOf("-p");
 		if (customFolderIndex != -1 && customFolderIndex + 1 < args.length) {
 			Globals.whiskerQsFolder = args[customFolderIndex + 1];
@@ -38,6 +38,7 @@ class Main {
 		app.addCommand(new WelcomeCommand());
 		app.addCommand(new IpcCommand());
 		app.addCommand(new UsersCommand());
+		app.addCommand(new VersionCommand());
 
 		app.run();
 	}
