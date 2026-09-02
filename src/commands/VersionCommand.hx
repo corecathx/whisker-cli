@@ -4,7 +4,7 @@ import claw.Command;
 
 class VersionCommand implements Command {
     public var name:String = "version";
-	public var description:String = "wawa is ok";
+	public var description:String = "outputs current whisker version";
 	public var arguments:Array<String> = [];
 
     public function new() {}

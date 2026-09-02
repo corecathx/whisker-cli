@@ -1,0 +1,4 @@
+# DONT RUN THIS, RUN release.hxml INSTEAD!
+-cp src
+--main Main
+--cpp target/cpp
