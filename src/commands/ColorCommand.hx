@@ -14,16 +14,7 @@ class ColorCommand implements Command {
 	public function new() {}
 
 	private function isVideo(path:String):Bool {
-		var videoExts:Array<String> = [
-			"mp4",
-			"mkv",
-			"webm",
-			"avi",
-			"mov",
-			"flv",
-			"wmv",
-			"m4v"
-		];
+		var videoExts:Array<String> = ["mp4", "mkv", "webm", "avi", "mov", "flv", "wmv", "m4v"];
 
 		var parts:Array<String> = path.split(".");
 
@@ -35,10 +26,7 @@ class ColorCommand implements Command {
 		return videoExts.contains(ext);
 	}
 
-	private function extractVideoFrame(
-		videoPath:String,
-		outputPath:String
-	):Void {
+	private function extractVideoFrame(videoPath:String, outputPath:String):Void {
 		Sys.println("extracting frame from video...");
 
 		var process:Process = new Process("ffmpeg", [
@@ -66,12 +54,7 @@ class ColorCommand implements Command {
 		process.close();
 	}
 
-	private function updateSchemes(
-		sourceType:String,
-		source:String,
-		mode:String,
-		contrast:Float
-	):Void {
+	private function updateSchemes(sourceType:String, source:String, mode:String, contrast:Float):Void {
 		var colorsJson:Dynamic = {};
 		var generatedMode:String = mode;
 
@@ -159,11 +142,7 @@ class ColorCommand implements Command {
 				throw "matugen returned invalid output for scheme '" + scheme + "'";
 			}
 
-			if (
-				mode == "smart" &&
-				generatedMode == "smart" &&
-				Reflect.hasField(parsed, "mode")
-			) {
+			if (mode == "smart" && generatedMode == "smart" && Reflect.hasField(parsed, "mode")) {
 				generatedMode = parsed.mode;
 			}
 
@@ -174,19 +153,10 @@ class ColorCommand implements Command {
 
 		Reflect.setField(colorsJson, "mode", generatedMode);
 
-		File.saveContent(
-			Globals.whiskerCSchemes,
-			Json.stringify(colorsJson)
-		);
+		File.saveContent(Globals.whiskerCSchemes, Json.stringify(colorsJson));
 	}
 
-	private function refreshMatugen(
-		sourceType:String,
-		source:String,
-		mode:String,
-		scheme:String,
-		contrast:Float
-	):Void {
+	private function refreshMatugen(sourceType:String, source:String, mode:String, scheme:String, contrast:Float):Void {
 		Sys.println("requesting matugen to refresh templates...");
 
 		var matugenArgs:Array<String>;
@@ -287,20 +257,9 @@ class ColorCommand implements Command {
 			extractVideoFrame(wallpaperPath, imageForColors);
 		}
 
-		updateSchemes(
-			"image",
-			imageForColors,
-			mode,
-			contrast
-		);
+		updateSchemes("image", imageForColors, mode, contrast);
 
-		refreshMatugen(
-			"image",
-			imageForColors,
-			mode,
-			scheme,
-			contrast
-		);
+		refreshMatugen("image", imageForColors, mode, scheme, contrast);
 
 		if (isVideoWallpaper && FileSystem.exists(imageForColors))
 			FileSystem.deleteFile(imageForColors);
@@ -308,10 +267,7 @@ class ColorCommand implements Command {
 		Sys.println("color schemes successfully updated!");
 	}
 
-	private function updateFromColor(
-		prefs:Dynamic,
-		color:String
-	):Void {
+	private function updateFromColor(prefs:Dynamic, color:String):Void {
 		if (!Reflect.hasField(prefs, "theme"))
 			throw "preferences have no theme";
 
@@ -342,20 +298,9 @@ class ColorCommand implements Command {
 		if (Reflect.hasField(prefs.theme, "contrast"))
 			contrast = prefs.theme.contrast;
 
-		updateSchemes(
-			"color",
-			color,
-			mode,
-			contrast
-		);
+		updateSchemes("color", color, mode, contrast);
 
-		refreshMatugen(
-			"color",
-			color,
-			mode,
-			scheme,
-			contrast
-		);
+		refreshMatugen("color", color, mode, scheme, contrast);
 
 		Sys.println("color schemes successfully updated!");
 	}
@@ -364,9 +309,7 @@ class ColorCommand implements Command {
 		if (!FileSystem.exists(Globals.whiskerUserPref))
 			throw "whisker user preferences not found";
 
-		var prefs:Dynamic = Json.parse(
-			File.getContent(Globals.whiskerUserPref)
-		);
+		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
 
 		updateFromWallpaper(prefs);
 	}
@@ -378,9 +321,7 @@ class ColorCommand implements Command {
 		if (!FileSystem.exists(Globals.whiskerUserPref))
 			throw "whisker user preferences not found";
 
-		var prefs:Dynamic = Json.parse(
-			File.getContent(Globals.whiskerUserPref)
-		);
+		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
 
 		var command:String = args[0];
 

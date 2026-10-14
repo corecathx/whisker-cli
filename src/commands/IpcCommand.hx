@@ -11,7 +11,7 @@ class IpcCommand implements Command {
 	public var description:String = "call whisker's quickshell ipc";
 	public var arguments:Array<String> = ['target', 'action'];
 
-    public function new() {}
+	public function new() {}
 
 	public function execute(args:Array<String>) {
 		if (!FileSystem.exists(Globals.whiskerLockFile))

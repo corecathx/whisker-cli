@@ -3,11 +3,11 @@ package commands;
 import claw.Command;
 
 class WawaCommand implements Command {
-    public var name:String = "wawa";
+	public var name:String = "wawa";
 	public var description:String = "wawa is ok";
 	public var arguments:Array<String> = [];
 
-    public function new() {}
+	public function new() {}
 
 	public function execute(args:Array<String>) {
 		var art:String = [

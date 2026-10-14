@@ -24,9 +24,7 @@ class WallpaperCommand implements Command {
 		if (!FileSystem.exists(Globals.whiskerUserPref))
 			throw "whisker user preferences not found";
 
-		var prefs:Dynamic = Json.parse(
-			File.getContent(Globals.whiskerUserPref)
-		);
+		var prefs:Dynamic = Json.parse(File.getContent(Globals.whiskerUserPref));
 
 		if (!Reflect.hasField(prefs, "theme")) {
 			Sys.println("preferences has missing field 'theme', loaded defaults");
@@ -56,10 +54,7 @@ class WallpaperCommand implements Command {
 			}
 		}
 
-		File.saveContent(
-			Globals.whiskerUserPref,
-			Json.stringify(prefs)
-		);
+		File.saveContent(Globals.whiskerUserPref, Json.stringify(prefs));
 
 		if (!args.contains("--no-color-update")) {
 			var colorCommand:ColorCommand = new ColorCommand();

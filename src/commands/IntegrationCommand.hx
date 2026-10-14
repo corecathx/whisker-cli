@@ -9,14 +9,14 @@ import sys.FileSystem;
 import claw.Command;
 
 enum abstract IntegrationTypes(String) from String to String {
-    var EXECS = 'execs';
-    var KEYBINDS = 'keybinds';
-    var RULES = 'rules';
+	var EXECS = 'execs';
+	var KEYBINDS = 'keybinds';
+	var RULES = 'rules';
 }
 
 enum abstract WindowManagers(String) from String to String {
-    var HYPRLAND = 'hyprland';
-    var NIRI = 'niri';
+	var HYPRLAND = 'hyprland';
+	var NIRI = 'niri';
 }
 
 class IntegrationCommand implements Command {
@@ -24,158 +24,156 @@ class IntegrationCommand implements Command {
 	public var description:String = "integration command for window managers";
 	public var arguments:Array<String> = ['wm', "<apply, revoke>"];
 
-    var supportedWindowManagers:Array<WindowManagers> = [HYPRLAND]; // :']
-    var integrationTypes:Array<IntegrationTypes> = [KEYBINDS, RULES, EXECS];
-    var integrationFiles:Map<IntegrationTypes, String> = [];
-    var userHyprConfigPath:String = '${Globals.userHomeDir}/.config/hypr/hyprland.lua';
+	var supportedWindowManagers:Array<WindowManagers> = [HYPRLAND]; // :']
+	var integrationTypes:Array<IntegrationTypes> = [KEYBINDS, RULES, EXECS];
+	var integrationFiles:Map<IntegrationTypes, String> = [];
+	var userHyprConfigPath:String = '${Globals.userHomeDir}/.config/hypr/hyprland.lua';
 
-    public function new() {}
+	public function new() {}
 
 	public function execute(args:Array<String>) {
-        // this is mainly for dev lol
+		// this is mainly for dev lol
 		if (FileSystem.exists(Globals.whiskerLockFile)) {
 			var lock:LockFile = Json.parse(File.getContent(Globals.whiskerLockFile));
 			Globals.whiskerQsFolder = lock.folder;
 		}
-        // init after loading whisker's qs folder in lockfile
-        integrationFiles = [
-            EXECS => Globals.whiskerQsFolder + "/integrations/hyprland/execs.lua",
-            KEYBINDS => Globals.whiskerQsFolder + "/integrations/hyprland/keybinds.lua",
-            RULES => Globals.whiskerQsFolder + "/integrations/hyprland/rules.lua"
-        ];
-        if (args.length == 0)
-            throw "no window managers specified " + supportedWindowManagers;
-		
-        if (!supportedWindowManagers.contains(args[0])) 
-            throw 'unsupported window manager "${args[0]}"';
+		// init after loading whisker's qs folder in lockfile
+		integrationFiles = [
+			EXECS => Globals.whiskerQsFolder + "/integrations/hyprland/execs.lua",
+			KEYBINDS => Globals.whiskerQsFolder + "/integrations/hyprland/keybinds.lua",
+			RULES => Globals.whiskerQsFolder + "/integrations/hyprland/rules.lua"
+		];
+		if (args.length == 0)
+			throw "no window managers specified " + supportedWindowManagers;
 
-        if (args.length < 2)
-            throw 'no action specified [apply, revoke]';
-        
-        switch (args[1]) {
-            case "apply":
-                if (args.length <= 2) 
-                    throw 'please specify which integrations to apply.\n'
-                        + 'supported types: [execs, keybinds, rules]\n'
-                        + 'examples:\n'
-                        + '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply execs\n'
-                        + '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply execs,rules\n'
-                        + '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply rules,execs,keybinds';
-                if (args.length > 3) 
-                    throw 'too many arguments\nnote: you don\'t need spaces when listing integration types.';
-                var requestedIntegrations:Array<String> = args[2].trim().split(",");
-                for (integration in requestedIntegrations) { 
-                    if (!integrationTypes.contains(integration))
-                        throw 'integration "$integration" not found';
-                }
+		if (!supportedWindowManagers.contains(args[0]))
+			throw 'unsupported window manager "${args[0]}"';
 
-                switch (args[0]) {
-                    case HYPRLAND:
-                        Sys.println("checking user's hyprland config file...");
-                        if (!FileSystem.exists(userHyprConfigPath))
-                            throw 'failed to apply integrations, couldn\'t find user\'s hyprland config ($userHyprConfigPath)';
+		if (args.length < 2)
+			throw 'no action specified [apply, revoke]';
 
-                        Sys.println('found hyprland.conf!');
+		switch (args[1]) {
+			case "apply":
+				if (args.length <= 2)
+					throw 'please specify which integrations to apply.\n'
+						+ 'supported types: [execs, keybinds, rules]\n'
+						+ 'examples:\n'
+						+ '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply execs\n'
+						+ '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply execs,rules\n'
+						+ '  whisker integration ${Utils.getRandom(supportedWindowManagers)} apply rules,execs,keybinds';
+				if (args.length > 3)
+					throw 'too many arguments\nnote: you don\'t need spaces when listing integration types.';
+				var requestedIntegrations:Array<String> = args[2].trim().split(",");
+				for (integration in requestedIntegrations) {
+					if (!integrationTypes.contains(integration))
+						throw 'integration "$integration" not found';
+				}
 
-                        if (!FileSystem.exists(Globals.whiskerLocalDir)) 
-                            FileSystem.createDirectory(Globals.whiskerLocalDir);
-                        else if (!FileSystem.isDirectory(Globals.whiskerLocalDir))
-                            throw '${Globals.whiskerLocalDir} exists, but it\'s not a directory... why?';
+				switch (args[0]) {
+					case HYPRLAND:
+						Sys.println("checking user's hyprland config file...");
+						if (!FileSystem.exists(userHyprConfigPath))
+							throw 'failed to apply integrations, couldn\'t find user\'s hyprland config ($userHyprConfigPath)';
 
-                        Sys.println('generating whisker hyprland config file...');
-                        var hyprContent:String = "--- Whisker Hyprland Integration File ---\n"
-                                                + "-- Generated by whisker-cli\n\n";
-                        hyprContent += 'function loadexternal(path)\n';
-                        hyprContent += '    local file, err = loadfile(path)\n';
-                        hyprContent += '    if (file) then\n';
-                        hyprContent += '        file()\n';
-                        hyprContent += '    else\n';
-                        hyprContent += '        error(err)\n';
-                        hyprContent += '    end\n';
-                        hyprContent += 'end\n\n';
+						Sys.println('found hyprland.conf!');
 
-                        for (integration in requestedIntegrations) {
-                            Sys.println('applying "$integration" integration...');
-                            var intFile:String = integrationFiles[integration];
-                            if (!FileSystem.exists(intFile))
-                                throw 'integration file for "$integration" not found at $intFile, is whisker installed properly?';
-                            hyprContent += "-- " + integration.toUpperCase() + " --\n";
-                            hyprContent += 'loadexternal("${intFile}")\n\n';
-                        }
-                        
-                        File.saveContent(Globals.whiskerHyprlandConfig, hyprContent);
-                        Sys.println('whisker hyprland config generated at ${Globals.whiskerHyprlandConfig}');
-                        Sys.println('appending: require("whisker") to user\'s hyprland config...');
+						if (!FileSystem.exists(Globals.whiskerLocalDir))
+							FileSystem.createDirectory(Globals.whiskerLocalDir);
+						else if (!FileSystem.isDirectory(Globals.whiskerLocalDir))
+							throw '${Globals.whiskerLocalDir} exists, but it\'s not a directory... why?';
 
-                        var userHyprContent:String = File.getContent(userHyprConfigPath);
-                        if (userHyprContent.contains("--whisker_generated_line")) { 
-                            Sys.println('whisker integration already applied');
-                        } else {
-                            userHyprContent += '\n--whisker_generated_line: do not remove these lines';
-                            userHyprContent += '\nrequire("whisker")';
-                            File.saveContent(userHyprConfigPath, userHyprContent);
-                            Sys.println('appended successfully!');
-                        }
+						Sys.println('generating whisker hyprland config file...');
+						var hyprContent:String = "--- Whisker Hyprland Integration File ---\n" + "-- Generated by whisker-cli\n\n";
+						hyprContent += 'function loadexternal(path)\n';
+						hyprContent += '    local file, err = loadfile(path)\n';
+						hyprContent += '    if (file) then\n';
+						hyprContent += '        file()\n';
+						hyprContent += '    else\n';
+						hyprContent += '        error(err)\n';
+						hyprContent += '    end\n';
+						hyprContent += 'end\n\n';
 
-                        Sys.println("reloading hyprland...");
-                        var process:Process = new Process('hyprctl', ['reload']);
-                        process.exitCode();
-                        process.close();
-                    case NIRI:
-                        Sys.println("niri support later, probably :']");
-                }
-                Sys.println('successfully integrated whisker with ${args[0]}');
-            case "revoke":
-                if (args.length > 2) 
-                    throw 'too many arguments for revoke';
-                
-                switch (args[0]) {
-                    case HYPRLAND:
-                        Sys.println("checking for whisker integration...");
-                        if (!FileSystem.exists(userHyprConfigPath))
-                            throw 'hyprland config not found at $userHyprConfigPath';
-                        
-                        var userHyprContent:String = File.getContent(userHyprConfigPath);
-                        if (!userHyprContent.contains("#whisker_generated_line")) {
-                            Sys.println('no whisker integration found, nothing to revoke');
-                            return;
-                        }
-                        
-                        Sys.println('found whisker integration, removing...');
-                        var lines:Array<String> = userHyprContent.split("\n");
-                        var cleanedLines:Array<String> = [];
-                        var skipNext:Bool = false;
-                        
-                        for (i in 0...lines.length) {
-                            if (skipNext) {
-                                skipNext = false;
-                                continue;
-                            }
-                            if (lines[i].contains("#whisker_generated_line")) {
-                                skipNext = true;
-                                continue;
-                            }
-                            cleanedLines.push(lines[i]);
-                        }
-                        File.saveContent(userHyprConfigPath, cleanedLines.join("\n"));
-                        Sys.println('removed integration from hyprland config');
-                        
-                        if (FileSystem.exists(Globals.whiskerHyprlandConfig)) {
-                            FileSystem.deleteFile(Globals.whiskerHyprlandConfig);
-                            Sys.println('deleted whisker hyprland config file');
-                        }
-                        
-                        Sys.println("reloading hyprland...");
-                        var process:Process = new Process('hyprctl', ['reload']);
-                        process.exitCode();
-                        process.close();
-                    case NIRI:
-                        Sys.println("niri support later, probably :']");
-                }
-                Sys.println('successfully revoked whisker integration from ${args[0]}');
-            default:
-                throw 'unknown action "${args[1]}"';
-        }
+						for (integration in requestedIntegrations) {
+							Sys.println('applying "$integration" integration...');
+							var intFile:String = integrationFiles[integration];
+							if (!FileSystem.exists(intFile))
+								throw 'integration file for "$integration" not found at $intFile, is whisker installed properly?';
+							hyprContent += "-- " + integration.toUpperCase() + " --\n";
+							hyprContent += 'loadexternal("${intFile}")\n\n';
+						}
 
-    }
+						File.saveContent(Globals.whiskerHyprlandConfig, hyprContent);
+						Sys.println('whisker hyprland config generated at ${Globals.whiskerHyprlandConfig}');
+						Sys.println('appending: require("whisker") to user\'s hyprland config...');
+
+						var userHyprContent:String = File.getContent(userHyprConfigPath);
+						if (userHyprContent.contains("--whisker_generated_line")) {
+							Sys.println('whisker integration already applied');
+						} else {
+							userHyprContent += '\n--whisker_generated_line: do not remove these lines';
+							userHyprContent += '\nrequire("whisker")';
+							File.saveContent(userHyprConfigPath, userHyprContent);
+							Sys.println('appended successfully!');
+						}
+
+						Sys.println("reloading hyprland...");
+						var process:Process = new Process('hyprctl', ['reload']);
+						process.exitCode();
+						process.close();
+					case NIRI:
+						Sys.println("niri support later, probably :']");
+				}
+				Sys.println('successfully integrated whisker with ${args[0]}');
+			case "revoke":
+				if (args.length > 2)
+					throw 'too many arguments for revoke';
+
+				switch (args[0]) {
+					case HYPRLAND:
+						Sys.println("checking for whisker integration...");
+						if (!FileSystem.exists(userHyprConfigPath))
+							throw 'hyprland config not found at $userHyprConfigPath';
+
+						var userHyprContent:String = File.getContent(userHyprConfigPath);
+						if (!userHyprContent.contains("#whisker_generated_line")) {
+							Sys.println('no whisker integration found, nothing to revoke');
+							return;
+						}
+
+						Sys.println('found whisker integration, removing...');
+						var lines:Array<String> = userHyprContent.split("\n");
+						var cleanedLines:Array<String> = [];
+						var skipNext:Bool = false;
+
+						for (i in 0...lines.length) {
+							if (skipNext) {
+								skipNext = false;
+								continue;
+							}
+							if (lines[i].contains("#whisker_generated_line")) {
+								skipNext = true;
+								continue;
+							}
+							cleanedLines.push(lines[i]);
+						}
+						File.saveContent(userHyprConfigPath, cleanedLines.join("\n"));
+						Sys.println('removed integration from hyprland config');
+
+						if (FileSystem.exists(Globals.whiskerHyprlandConfig)) {
+							FileSystem.deleteFile(Globals.whiskerHyprlandConfig);
+							Sys.println('deleted whisker hyprland config file');
+						}
+
+						Sys.println("reloading hyprland...");
+						var process:Process = new Process('hyprctl', ['reload']);
+						process.exitCode();
+						process.close();
+					case NIRI:
+						Sys.println("niri support later, probably :']");
+				}
+				Sys.println('successfully revoked whisker integration from ${args[0]}');
+			default:
+				throw 'unknown action "${args[1]}"';
+		}
+	}
 }

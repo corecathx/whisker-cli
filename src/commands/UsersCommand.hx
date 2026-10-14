@@ -9,17 +9,19 @@ class UsersCommand implements Command {
 	public var description:String = "configure a user data for usage in whisker";
 	public var arguments:Array<String> = ['username', '<icon, wallpaper>'];
 
-    public function new() {}
+	public function new() {}
 
 	public static function run(args:Array<String>) {
 		var command = new UsersCommand();
 		command.execute(args);
 	}
+
 	public static function wallpaper(args:Array<String>) {
 		var command = new UsersCommand();
 		command.initialCheck('pkexec ' + Sys.programPath() + ' users ' + args.join(' '));
 		command.setWallpaper(args);
 	}
+
 	public function setWallpaper(args:Array<String>) {
 		if (args.length < 3)
 			throw "missing wallpaper path argument";
@@ -31,6 +33,7 @@ class UsersCommand implements Command {
 		File.copy(args[2], destWallpaperPath);
 		Sys.println("copied wallpaper to " + destWallpaperPath);
 	}
+
 	public function execute(args:Array<String>) {
 		initialCheck();
 
@@ -72,16 +75,16 @@ class UsersCommand implements Command {
 			Sys.exit(0);
 		}
 		if (!FileSystem.exists(Globals.whiskerGreeterDir)) {
-            Sys.println("greeter dir not found, creating directory... " + '(${Globals.whiskerGreeterDir})');
-            FileSystem.createDirectory(Globals.whiskerGreeterDir);
+			Sys.println("greeter dir not found, creating directory... " + '(${Globals.whiskerGreeterDir})');
+			FileSystem.createDirectory(Globals.whiskerGreeterDir);
 		}
 		if (!FileSystem.exists(Globals.whiskerGreeterAvatarDir)) {
-            Sys.println("greeter avatar dir not found, creating directory... " + '(${Globals.whiskerGreeterAvatarDir})');
-            FileSystem.createDirectory(Globals.whiskerGreeterAvatarDir);
+			Sys.println("greeter avatar dir not found, creating directory... " + '(${Globals.whiskerGreeterAvatarDir})');
+			FileSystem.createDirectory(Globals.whiskerGreeterAvatarDir);
 		}
 		if (!FileSystem.exists(Globals.whiskerGreeterWallpaperDir)) {
-            Sys.println("greeter wallpaper dir not found, creating directory... " + '(${Globals.whiskerGreeterWallpaperDir})');
-            FileSystem.createDirectory(Globals.whiskerGreeterWallpaperDir);
+			Sys.println("greeter wallpaper dir not found, creating directory... " + '(${Globals.whiskerGreeterWallpaperDir})');
+			FileSystem.createDirectory(Globals.whiskerGreeterWallpaperDir);
 		}
 	}
 }
