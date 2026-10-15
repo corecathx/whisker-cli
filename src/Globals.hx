@@ -1,6 +1,7 @@
 package;
 
 @:publicFields
+@:inline
 class Globals {
     static var currentUser:String = Sys.getEnv("USER");
 
@@ -29,5 +30,8 @@ class Globals {
 	// the path where whisker stores its hyprland integration files
 	// which later injects it to user's hyprland config
 	static var whiskerHyprlandConfig:String = userHyprConfigDir + "/whisker.lua";
+
+    static var githubCompareApiURL:String = "https://api.github.com/repos/corecathx/whisker/compare/";
+
 
 }

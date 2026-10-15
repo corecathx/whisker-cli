@@ -3,7 +3,7 @@
 set -e
 
 export WHISKER_VERSION="dev"
-export WHISKER_COMMIT="dev"
+export WHISKER_COMMIT="1f935ab"
 
 echo "building whisker..."
 haxe dev.hxml
